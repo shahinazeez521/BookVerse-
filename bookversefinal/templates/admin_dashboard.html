@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="admin-dashboard">
+    <h2>Admin Dashboard - <span class="bookverse-title">BOOKVERSE</span></h2>
+
+    <!-- Book Requests Section -->
+    <div class="reports-section">
+        <h3>Pending Book Requests</h3>
+        {% if book_requests %}
+        <div class="report-list">
+            {% for request in book_requests %}
+            <div class="report-item">
+                <div class="report-details">
+                    <p><strong>Title:</strong> {{ request.title }}</p>
+                    <p><strong>Author:</strong> {{ request.author }}</p>
+                    <p><strong>Price:</strong> ₹{{ "%.2f"|format(request.price) }}</p>
+                    <p><strong>Condition:</strong> {{ request.condition }}</p>
+                    <p><strong>Requested by:</strong> {{ request.requester.username if request.requester else 'Anonymous' }}</p>
+                    <p><strong>Status:</strong> {{ request.status | capitalize }}</p>
+                    {% if request.image_url %}
+                    <p><strong>Image:</strong> <img src="{{ request.image_url }}" alt="{{ request.title }}" style="max-width: 100px;"></p>
+                    {% endif %}
+                </div>
+                <div>
+                    <form method="POST" action="{{ url_for('approve_book_request', request_id=request.id) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to approve this book request?');">Approve</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('reject_book_request', request_id=request.id) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to reject this book request?');">Reject</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No pending book requests.</p>
+        {% endif %}
+    </div>
+
+    <!-- Review Reports Section -->
+    <div class="reports-section">
+        <h3>Review Reports</h3>
+        {% if reports %}
+        <div class="report-list">
+            {% for report in reports %}
+            {% if report.book %}
+            <div class="report-item">
+                <div class="report-details">
+                    <p><strong>Book:</strong> {{ report.book.title }} by {{ report.book.author }}</p>
+                    <p><strong>Reported by:</strong> {{ report.user.username if report.user else 'Anonymous' }}</p>
+                    <p><strong>Reason:</strong> {{ report.reason }}</p>
+                    <p><strong>Status:</strong> {{ report.status | capitalize }}</p>
+                </div>
+                <form method="POST" action="{{ url_for('remove_reported_book', report_id=report.id) }}">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this book? This will delete the book and associated reports.');">
+                        Remove Book
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No pending reports.</p>
+        {% endif %}
+    </div>
+
+    <!-- All Books Section -->
+    <h3>All Books</h3>
+    {% if books %}
+    <div class="book-list">
+        {% for book in books %}
+        <div class="book-item">
+            <div class="book-image-container">
+                <img src="{{ book.image_url or url_for('static', filename='images/default-book-cover.jpg') }}" alt="{{ book.title }}" class="book-cover">
+            </div>
+            <div class="book-details">
+                <h4 class="book-title">{{ book.title }}</h4>
+                <p class="book-author">{{ book.author }}</p>
+                <p class="book-condition">{{ book.condition }}</p>
+                <p class="book-price">₹{{ "%.2f"|format(book.price) }}</p>
+                <div class="book-rating">
+                    {% set avg_rating = (book.reviews | map(attribute='rating') | list | sum / book.reviews | length) | round if book.reviews else 0 %}
+                    {% for i in range(5) %}
+                        <i class="fas fa-star {{ 'filled' if i < avg_rating }}"></i>
+                    {% endfor %}
+                    <span>({{ book.reviews|length }} Reviews)</span>
+                </div>
+                <form method="POST" action="{{ url_for('admin_dashboard') }}">
+                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this book?');">Remove Book</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No books available.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="form-card">
+        <h2>Sell on <span class="bookverse-title">BOOKVERSE</span></h2>
+        <form method="POST" class="book-form" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" placeholder="Enter book title" required>
+            </div>
+            <div class="form-group">
+                <label for="author">Author</label>
+                <input type="text" id="author" name="author" placeholder="Enter book author" required>
+            </div>
+            <div class="form-group">
+                <label for="condition">Condition</label>
+                <select id="condition" name="condition" required>
+                    <option value="">Select Book Condition</option>
+                    <option value="Excellent">Excellent</option>
+                    <option value="Good">Good</option>
+                    <option value="Fair">Fair</option>
+                    <option value="Poor">Poor</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="price">Price</label>
+                <input type="number" id="price" name="price" step="0.01" placeholder="Enter book price" required>
+            </div>
+            <div class="form-group">
+                <label for="image">Book Image</label>
+                <input type="file" id="image" name="image" accept="image/*" required>
+            </div>
+            <div class="form-group">
+                <label for="contact_details">Contact Details</label>
+                <input type="text" id="contact_details" name="contact_details" placeholder="Enter phone or email for buyers" required>
+            </div>
+            <button type="submit" class="btn-submit">List for Sale</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
