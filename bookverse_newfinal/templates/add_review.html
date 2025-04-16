@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="review-container">
+    <!-- Submit Review Section -->
+    <section class="submit-review-section form-card">
+        <h2>Submit a Review</h2>
+        <form method="POST" action="{{ url_for('add_review') }}">
+            <input type="hidden" name="submit_review" value="1">
+            <div class="form-group">
+                <label for="book_id">Select Book</label>
+                <select id="book_id" name="book_id" required>
+                    <option value="">-- Select a Book --</option>
+                    {% for book in books %}
+                        <option value="{{ book.id }}">{{ book.title }} by {{ book.author }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="rating">Rating</label>
+                <select id="rating" name="rating" required>
+                    <option value="">-- Select Rating --</option>
+                    <option value="1">1 ★</option>
+                    <option value="2">2 ★</option>
+                    <option value="3">3 ★</option>
+                    <option value="4">4 ★</option>
+                    <option value="5">5 ★</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="text">Review</label>
+                <textarea id="text" name="text" placeholder="Write your review here..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Review</button>
+        </form>
+    </section>
+
+    <!-- Separator -->
+    <div class="section-separator">
+        <hr>
+        <p class="separator-text">OR</p>
+        <hr>
+    </div>
+
+    <!-- Request Book Section -->
+    <section class="request-book-section form-card">
+        <h2>Request to Add a Book</h2>
+        <form method="POST" action="{{ url_for('add_review') }}" enctype="multipart/form-data">
+            <input type="hidden" name="request_book" value="1">
+            <div class="form-group">
+                <label for="title">Book Title</label>
+                <input type="text" id="title" name="title" placeholder="Enter book title" required>
+            </div>
+            <div class="form-group">
+                <label for="author">Author</label>
+                <input type="text" id="author" name="author" placeholder="Enter author name" required>
+            </div>
+            <div class="form-group">
+                <label for="price">Price (₹)</label>
+                <input type="number" id="price" name="price" placeholder="Enter price" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="condition">Condition</label>
+                <select id="condition" name="condition" required>
+                    <option value="">-- Select Condition --</option>
+                    <option value="New">New</option>
+                    <option value="Like New">Like New</option>
+                    <option value="Good">Good</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="image">Book Cover Image (Optional)</label>
+                <input type="file" id="image" name="image" accept="image/*">
+            </div>
+            <button type="submit" class="btn btn-primary">Request Book</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

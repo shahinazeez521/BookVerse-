@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h2 class="section-title mb-4">Your Profile - <span class="bookverse-title">BOOKVERSE</span></h2>
+    
+    <div class="profile-section">
+        <h3>Welcome, {{ user.username }}!</h3>
+        
+        <!-- Profile Image -->
+        <div class="profile-image-section">
+            <h4>Your Profile Image</h4>
+            <div class="profile-image-container">
+                <img src="{{ user.profile_image_url or url_for('static', filename='images/default-profile.jpg') }}" 
+                     alt="Profile Image" class="profile-image">
+            </div>
+            {% if not user.profile_image_url %}
+            <form method="POST" action="{{ url_for('upload_profile_image') }}" enctype="multipart/form-data" class="upload-form">
+                <div class="form-group">
+                    <label for="profile_image">Upload New Profile Image (Optional):</label>
+                    <input type="file" id="profile_image" name="profile_image" accept="image/*" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </form>
+            {% endif %}
+        </div>
+
+        <!-- Notifications -->
+        <div class="profile-subsection">
+            <h4>Notifications</h4>
+            {% if notifications %}
+            <div class="notification-list">
+                {% for notification in notifications %}
+                <div class="notification-item">
+                    <p>{{ notification.message }} <small>({{ notification.created_at.strftime('%Y-%m-%d %H:%M:%S') }})</small></p>
+                    <form method="POST" action="{{ url_for('mark_notification_read', notification_id=notification.id) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-primary btn-sm">Mark as Read</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>No new notifications.</p>
+            {% endif %}
+        </div>
+
+        <!-- Purchased Books -->
+        <div class="profile-subsection">
+            <h4>Books You Purchased</h4>
+            {% if purchased_books %}
+            <div class="book-list compact-book-list">
+                {% for book in purchased_books %}
+                <div class="book-item compact-book-item">
+                    <div class="book-image-container compact-book-image">
+                        <img src="{{ book.image_url or url_for('static', filename='images/default-book-cover.jpg') }}" 
+                             alt="{{ book.title }}" class="book-cover">
+                    </div>
+                    <div class="book-details">
+                        <h4 class="book-title">{{ book.title }}</h4>
+                        <p class="book-author">by {{ book.author }}</p>
+                        <p class="book-condition">Condition: {{ book.condition }}</p>
+                        <p class="book-price">₹{{ "%.2f"|format(book.price) }}</p>
+                        <p><strong>Seller Contact:</strong> {{ book.contact_details }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>You haven’t purchased any books yet. <a href="{{ url_for('buy_book') }}">Buy a book now!</a></p>
+            {% endif %}
+        </div>
+
+        <!-- Sold Books -->
+        <div class="profile-subsection">
+            <h4>Books You Sold</h4>
+            {% if sold_books %}
+            <div class="book-list compact-book-list">
+                {% for book in sold_books %}
+                <div class="book-item compact-book-item">
+                    <div class="book-image-container compact-book-image">
+                        <img src="{{ book.image_url or url_for('static', filename='images/default-book-cover.jpg') }}" 
+                             alt="{{ book.title }}" class="book-cover">
+                    </div>
+                    <div class="book-details">
+                        <h4 class="book-title">{{ book.title }}</h4>
+                        <p class="book-author">by {{ book.author }}</p>
+                        <p class="book-condition">Condition: {{ book.condition }}</p>
+                        <p class="book-price">₹{{ "%.2f"|format(book.price) }}</p>
+                        <p><strong>Buyer ID:</strong> {{ book.buyer_id }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>You haven’t sold any books yet. <a href="{{ url_for('sell_book') }}">Sell a book now!</a></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

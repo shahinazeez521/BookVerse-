@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h2 class="section-title mb-4">Buy from <span class="bookverse-title">BOOKVERSE</span></h2>
+    
+    <!-- Book List -->
+    <div class="book-list row">
+        {% for book in books %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 book-item shadow-sm">
+                <div class="book-image-container">
+                    <img src="{{ book.image_url or url_for('static', filename='images/default-book-cover.jpg') }}" alt="{{ book.title }}" class="card-img-top book-cover">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text">
+                        <strong>Author:</strong> {{ book.author }}<br>
+                        <strong>Condition:</strong> {{ book.condition }}<br>
+                        <strong>Price:</strong> ₹{{ "%.2f"|format(book.price) }}
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="button-group">
+                        <form method="POST" action="{{ url_for('buy_book') }}" class="button-form">
+                            <input type="hidden" name="book_id" value="{{ book.id }}">
+                            <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to buy this book?');">
+                                <i class="fas fa-shopping-cart"></i> Buy Now
+                            </button>
+                        </form>
+                        <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-info">
+                            <i class="fas fa-info-circle"></i> Details
+                        </a>
+                        <button class="btn btn-warning report-btn" data-book-id="{{ book.id }}" onclick="openReportModal(this)">
+                            <i class="fas fa-flag"></i> Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% if not books %}
+    <p>No books available for purchase on BOOKVERSE at this time.</p>
+    {% endif %}
+
+    <!-- Purchased Book Contact Details -->
+    {% if purchased_book %}
+    <div class="purchase-confirmation mt-4">
+        <h3>Purchase Confirmation</h3>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ purchased_book.title }}</h5>
+                <p class="card-text">
+                    <strong>Author:</strong> {{ purchased_book.author }}<br>
+                    <strong>Price Paid:</strong> ₹{{ "%.2f"|format(purchased_book.price) }}<br>
+                    <strong>Seller Contact Details:</strong> {{ purchased_book.contact_details }}<br>
+                    <em>Please contact the seller to arrange delivery or pickup.</em>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Report Modal -->
+    <div class="modal" id="reportModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeReportModal()">×</span>
+            <h3>Report a Book</h3>
+            <form method="POST" action="{{ url_for('report_book') }}" id="reportForm">
+                <input type="hidden" name="book_id" id="reportBookId">
+                <div class="form-group">
+                    <label for="reason">Reason for Reporting</label>
+                    <textarea id="reason" name="reason" placeholder="Please explain why you are reporting this book" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-danger">Submit Report</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function openReportModal(button) {
+    const bookId = button.getAttribute('data-book-id');
+    document.getElementById('reportBookId').value = bookId;
+    document.getElementById('reportModal').style.display = 'block';
+}
+
+function closeReportModal() {
+    document.getElementById('reportModal').style.display = 'none';
+    document.getElementById('reportForm').reset();
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('reportModal');
+    if (event.target == modal) {
+        closeReportModal();
+    }
+}
+</script>
+{% endblock %}

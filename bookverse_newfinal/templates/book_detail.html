@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="book-detail-card">
+        <div class="book-header">
+            <h2>{{ book.title }} <small>on <span class="bookverse-title">BOOKVERSE</span></small></h2>
+            <span class="book-price">${{ book.price }}</span>
+        </div>
+        
+        <div class="book-image-container">
+            <img src="{{ book.image_url or url_for('static', filename='images/default-book-cover.jpg') }}" alt="{{ book.title }}" class="card-img-top book-cover">
+        </div>
+        
+        <div class="book-info">
+            <p><strong>Author:</strong> {{ book.author }}</p>
+            <p><strong>Condition:</strong> {{ book.condition }}</p>
+            <p><strong>Status:</strong> {{ book.status | capitalize }}</p>
+        </div>
+
+        <!-- Reviews Section Moved Up for Emphasis -->
+        <div class="reviews-section">
+            <h3>Book Reviews</h3>
+            {% if reviews %}
+                {% for review in reviews %}
+                    <div class="review-item">
+                        <div class="review-rating">
+                            {% for i in range(review.rating) %}
+                                <i class="fas fa-star"></i>
+                            {% endfor %}
+                            {% for i in range(5 - review.rating) %}
+                                <i class="far fa-star"></i>
+                            {% endfor %}
+                        </div>
+                        <p>{{ review.text }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No reviews yet. Be the first to add one!</p>
+            {% endif %}
+        </div>
+
+        <div class="review-form-section">
+            <h3>Add a Review</h3>
+            <form method="POST" class="review-form">
+                <div class="form-group">
+                    <label for="rating">Rating</label>
+                    <select id="rating" name="rating" required>
+                        <option value="">Select Rating</option>
+                        <option value="1">1 Star</option>
+                        <option value="2">2 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="5">5 Stars</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="review-text">Your Review</label>
+                    <textarea id="review-text" name="text" placeholder="Write your review here" required></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Submit Review</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

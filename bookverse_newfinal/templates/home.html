@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="main-content">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h3 class="sidebar-title">Filters</h3>
+            <form method="GET" action="{{ url_for('home') }}">
+                <div class="filter-section">
+                    <h4>Price Range</h4>
+                    <div class="filter-group price-range">
+                        <input type="number" placeholder="Min Price" name="min-price" value="{{ request.args.get('min-price', '') }}">
+                        <input type="number" placeholder="Max Price" name="max-price" value="{{ request.args.get('max-price', '') }}">
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <h4>Rating</h4>
+                    <div class="filter-group">
+                        <label><input type="checkbox" name="rating" value="4" {% if '4' in request.args.getlist('rating') %}checked{% endif %}> 4 ★ & above</label>
+                        <label><input type="checkbox" name="rating" value="3" {% if '3' in request.args.getlist('rating') %}checked{% endif %}> 3 ★ & above</label>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <h4>Book Condition</h4>
+                    <div class="filter-group">
+                        <label><input type="checkbox" name="condition" value="new" {% if 'new' in request.args.getlist('condition') %}checked{% endif %}> New</label>
+                        <label><input type="checkbox" name="condition" value="like-new" {% if 'like-new' in request.args.getlist('condition') %}checked{% endif %}> Like New</label>
+                        <label><input type="checkbox" name="condition" value="good" {% if 'good' in request.args.getlist('condition') %}checked{% endif %}> Good</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+            </form>
+        </aside>
+
+        <!-- Main Book List -->
+        <section class="book-section">
+            <!-- Search Bar -->
+            <div class="search-section">
+                <form method="GET" action="{{ url_for('home') }}" class="input-group">
+                    <input type="text" id="book-search" name="search" class="form-control" placeholder="Search by title or author" value="{{ request.args.get('search', '') }}">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+                </form>
+            </div>
+
+            <!-- Sort and Results -->
+            <div class="results-header">
+                <span class="results-count">{{ books|length }} books found</span>
+                <div class="sort-section">
+                    <form method="GET" action="{{ url_for('home') }}">
+                        <select id="sort" name="sort" onchange="this.form.submit()">
+                            <option value="relevance" {% if sort == 'relevance' %}selected{% endif %}>Sort by Relevance</option>
+                            <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                            <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                            <option value="rating_desc" {% if sort == 'rating_desc' %}selected{% endif %}>Rating: High to Low</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Book List -->
+            {% if books %}
+            <div class="book-list">
+                {% for book in books %}
+                <div class="book-item">
+                    <div class="book-image-container">
+                        <img src="{{ book.image_url or url_for('static', filename='images/default-book-cover.jpg') }}" alt="{{ book.title }}" class="book-cover">
+                    </div>
+                    <div class="book-details">
+                        <h4 class="book-title">{{ book.title }}</h4>
+                        <p class="book-author">by {{ book.author }}</p>
+                        <p class="book-condition">Condition: {{ book.condition }}</p>
+                        <p class="book-price">₹{{ "%.2f"|format(book.price) }}</p>
+                        <div class="book-rating">
+                            {% set avg_rating = (book.reviews | map(attribute='rating') | list | sum / book.reviews | length) | round if book.reviews else 0 %}
+                            {% for i in range(5) %}
+                                <i class="fas fa-star {{ 'filled' if i < avg_rating }}"></i>
+                            {% endfor %}
+                            <span>({{ book.reviews|length }} Reviews)</span>
+                        </div>
+                        <!-- Updated Button -->
+                        <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-primary">
+                            <i class="fas fa-star"></i> View Reviews
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="no-books">No books found. Try adding a book via the "Resell" page or request a book via the "Review" page.</p>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}
